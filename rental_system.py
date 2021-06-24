@@ -374,7 +374,7 @@ def display_books():
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button))
     select_button.grid(row=8, column=3 , pady = 5, sticky=W, padx = 15)
 
-def login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry):
+def login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button):
     try:
         frame_destroy()
         frame_update()
@@ -413,6 +413,7 @@ def login(display_book_button, add_book_button, display_customer_button, display
                     display_rentals_button ["state"] = NORMAL
                     rent_button ["state"] = NORMAL
                     search_button ["state"] = NORMAL
+                    return_rentals_button ["state"] = NORMAL
                     role_entry.insert(END, users[0])
                     role_entry.config(state="disabled", disabledbackground = "#403b35", disabledforeground = "white") 
                     messagebox.showinfo("Successful", "Successfully log in!")
@@ -426,13 +427,13 @@ def login(display_book_button, add_book_button, display_customer_button, display
         login_button.grid(row=5, column=1, sticky = W, pady = (30,10), padx = 20)
         ask_signin = Label(frame, text="Don't have an account?", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"))
         ask_signin.grid(row=6, column=1, sticky=W, pady = (20,0))
-        signin_button = Button(frame, text="Sign in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry))
+        signin_button = Button(frame, text="Sign in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button))
         signin_button.grid(row=7, column=1, sticky = W, pady = (5,20), padx= 50)
 
     except:
         messagebox.showerror("Error", "Incorrect username or password")
 
-def signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry):
+def signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button):
     try:
         frame_destroy()
         frame_update()
@@ -473,6 +474,7 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
                     display_rentals_button ["state"] = NORMAL
                     rent_button ["state"] = NORMAL
                     search_button ["state"] = NORMAL
+                    return_rentals_button ["state"] = NORMAL
                     role_entry.insert(END, user_data[2])
                     role_entry.config(state="disabled", disabledbackground = "#403b35", disabledforeground = "white") 
                     messagebox.showinfo("Successful", "Successfully signed in!")
@@ -486,7 +488,7 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
         signin_button.grid(row=7, column=1, sticky = W, pady = (30,10), padx = 20)
         ask_login = Label(frame, text="Already have an account?", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"))
         ask_login.grid(row=8, column=1, sticky=W, pady = (20,0))
-        login_button = Button(frame, text="Log in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry))
+        login_button = Button(frame, text="Log in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button))
         login_button.grid(row=9, column=1, sticky = W, pady = (5,20), padx= 50)
 
     except:
@@ -684,7 +686,7 @@ def customer_type():
     #allows the user to choose, if new_customer add customer details first, else proceed to the rental.
     new_customer_button = Button(frame, text="New Customer", background = "royal blue", fg = "white", font = ("Open Sans", 14, "bold"), padx =20, pady = 30, command = add_customer_details)
     new_customer_button.grid(row=1, column=0, padx = (50,30), pady = 50)
-    old_customer_button = Button(frame, text="Old Customer", background = "#EEEEEE", fg = "black", font = ("Open Sans", 14, "bold"), padx =20, pady = 30)
+    old_customer_button = Button(frame, text="Old Customer", background = "#EEEEEE", fg = "black", font = ("Open Sans", 14, "bold"), padx =20, pady = 30, command = pick_customer_to_rent)
     old_customer_button.grid(row=1, column=1, padx = (30,50), pady = 50)
 
 def rent_book(customer_id, name):
@@ -867,6 +869,59 @@ def rent_books_in_cart(customer_id, name):
         item_cost = []
         book_count = 0
 
+def pick_customer_to_rent():
+    try: #destroys existing frames from other display
+        frame_destroy()
+        table_destroy()
+    except:
+        pass
+    
+    frame_update()
+    table_update()
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
+
+    select_customer_title = Label(frame, text= "Select Customer to Rent", background = "#2f2f2d", font = ("Open Sans", 14, "bold"), fg="white" )
+    select_customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10)
+
+     #define columns of the table
+    table ["columns"] = ("Customer ID", "Name", "Phone Number", "Address", "Valid ID", "Photo")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Customer ID", width = 95, anchor = CENTER, stretch = NO)
+    table.column("Name", width = 290, anchor = CENTER)
+    table.column("Phone Number", width = 135, anchor = CENTER)
+    table.column("Address", width = 195, anchor = CENTER)
+    table.column("Valid ID", width = 180, anchor = CENTER)
+    table.column("Photo",  width = 180, anchor = CENTER)
+    #table.column("Availability",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Customer ID", text = "Customer ID", anchor = CENTER )
+    table.heading("Name", text = "Full Name", anchor = CENTER )
+    table.heading("Phone Number", text = "Phone Number", anchor = CENTER )
+    table.heading("Address", text = "Address", anchor = CENTER )
+    table.heading("Valid ID", text = "Valid ID", anchor = CENTER)
+    table.heading("Photo", text = "Photo",  anchor = CENTER)
+    # table.heading("Availability", text = "Availability",  anchor = CENTER)
+
+    count = 0
+    display_customer_query = "SELECT * FROM customer"
+    cursor.execute(display_customer_query)
+
+    for customer_details in cursor:
+        table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]))
+        count += 1
+    table.grid(row=1, column=0, rowspan=6, columnspan=7)
+
+    def get_data():
+        selected = table.focus()
+        values = table.item(selected, "values")
+        rent_book(values[0], values[1])
+
+    enter_button = Button(frame, text="Enter", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = get_data)
+    enter_button.grid(row=8, column=3 , sticky = N, pady=20)
+
 root = Tk()
 root.title("Book Rental System")
 root.geometry("1440x730")
@@ -900,11 +955,13 @@ add_book_button = Button(sidebar, text="Add Books\nin the Inventory",  bg='#2f2f
 display_customer_button = Button(sidebar, text="Display\nCustomer",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= display_customers)
 display_rentals_button =  Button(sidebar, text="Display\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= None)
 rent_book_button =  Button(sidebar, text="Rent",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=customer_type)
+return_rentals_button = Button(sidebar, text="Return\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=None)
 display_book_button.grid(row=0, column=0, pady = 20)
 add_book_button.grid(row=1, column=0,  pady = 20)
 display_customer_button.grid(row=2, column=0,  pady = 20)
 display_rentals_button.grid(row=3, column=0, pady=20)
 rent_book_button.grid(row=4, column=0, pady=20)
+return_rentals_button.grid(row=5, column=0,pady=20)
 
 
 #search button
@@ -926,6 +983,7 @@ add_book_button ["state"] = DISABLED
 display_customer_button ["state"] = DISABLED
 display_rentals_button ["state"] = DISABLED
 rent_book_button ["state"] = DISABLED
+return_rentals_button ["state"] = DISABLED 
 search_button ["state"] = DISABLED 
 
 #initialize table and map its style
@@ -939,6 +997,6 @@ style.configure("Treeview",font=("Montserrat", 12), foreground = "white")
 style.configure("Treeview.Heading",font=("Montserrat", 12),  background = "#2f2f2d", foreground = "white")
 style.map("Treeview", background=[("selected", "#403b35")])
 
-login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_book_button, search_button, role_entry)
+login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_book_button, search_button, role_entry, return_rentals_button)
 
 root.mainloop()

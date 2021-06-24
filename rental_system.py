@@ -89,7 +89,7 @@ def edit_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, 
             database.commit()
             #changes values in the table, where the values are from the entries provided
             selected = table.focus()
-            values = table.item(selected, text = "", values=(customer_id_entry.get(), name_entry.get(), phonenum_entry.get(), address_entry.get(), val_id_entry.get()))
+            values = table.item(selected, text = "", values=(customer_id_entry.get(), name_entry.get(), phonenum_entry.get(), address_entry.get(), val_id_entry.get(), photo_entry.get()))
             customer_id_entry.delete(0, END)
             name_entry.delete(0, END)
             phonenum_entry.delete(0, END)
@@ -388,7 +388,7 @@ def login(display_book_button, add_book_button, display_customer_button, display
 
         password_lbl = Label(frame,text= "Password", background = "#2f2f2d", fg = "white", font = ("Open Sans", 14))
         password_lbl.grid(row=3, column=0, sticky = W, pady=20, padx = 20)
-        password_entry = Entry(frame, font=('Helvetica',14, "bold"), width=50)
+        password_entry = Entry(frame, show="*", font=('Helvetica',14, "bold"), width=50)
         password_entry.grid(row=4, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
 
         def getdata():
@@ -486,7 +486,7 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
     except:
         pass
 
-def rent():
+def add_books_inventory():
     try: #destroys existing frames from other display
         frame_destroy()
         table_destroy()

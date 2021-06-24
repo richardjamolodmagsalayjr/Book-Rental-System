@@ -485,6 +485,112 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
 
     except:
         pass
+
+def add_book_inventory():
+    try: #destroys existing frames from other display
+        frame_destroy()
+        table_destroy()
+    except:
+        pass
+    
+    frame_update()
+    table_update()
+    frame.grid(row=1, column=1, rowspan = 19, columnspan=6, sticky=NW, pady = 40, padx=270)
+
+    book_details_title = Label(frame, text="Book Details", background = "#2f2f2d", fg = "white", font = ("Open Sans", 18, "bold"))
+    book_details_title.grid(row=0, column=0, sticky = N, columnspan =3)
+
+    book_id_lbl = Label(frame, text = "Book ID", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    book_id_lbl.grid(row=1, column=0, sticky = W,pady=(10,2), padx = 20)
+    book_id_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    book_id_entry.grid(row=2, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    title_lbl = Label(frame,text= "Title", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    title_lbl.grid(row=3, column=0, sticky = W, pady=(10,2), padx = 20)
+    title_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    title_entry.grid(row=4, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    publisher_lbl = Label(frame,text= "Publisher", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    publisher_lbl.grid(row=5, column=0, sticky = W, pady=(10,2), padx = 20)
+    publisher_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    publisher_entry.grid(row=6, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    isbn_lbl = Label(frame,text= "ISBN", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    isbn_lbl.grid(row=7, column=0, sticky = W, pady=(10,2), padx = 20)
+    isbn_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    isbn_entry.grid(row=8, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    yearpub_lbl = Label(frame,text= "Year Published (YYYY-MM-DD)", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    yearpub_lbl.grid(row=9, column=0, sticky = W, pady=(10,2), padx = 20)
+    yearpub_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    yearpub_entry.grid(row=10, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+    
+    bookcost_lbl = Label(frame,text= "Rental Price or Book Cost", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    bookcost_lbl.grid(row=11, column=0, sticky = W, pady=(10,2), padx = 20)
+    bookcost_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    bookcost_entry.grid(row=12, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    genre_lbl = Label(frame,text= "Genre (e.g romance,comedy)", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    genre_lbl.grid(row=13, column=0, sticky = W, pady=(10,2), padx = 20)
+    genre_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    genre_entry.grid(row=14, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    author_fname_lbl = Label(frame,text= "Author First Name", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    author_fname_lbl.grid(row=15, column=0, sticky = W, pady=(10,2), padx = 20)
+    author_fname_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    author_fname_entry.grid(row=16, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+
+    author_lname_lbl = Label(frame,text= "Author Last Name", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10))
+    author_lname_lbl.grid(row=17, column=0, sticky = W, pady=(10,2), padx = 20)
+    author_lname_entry = Entry(frame, font=('Helvetica',10, "bold"), width=50)
+    author_lname_entry.grid(row=18, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+    
+    def getdata():
+        #try:
+        run = True
+        #b_details refers to single valued-simple attributes 
+        b_details = [book_id_entry.get(),title_entry.get(),publisher_entry.get(),isbn_entry.get(),yearpub_entry.get(),bookcost_entry.get(), "Available", author_fname_entry.get(), author_lname_entry.get()] #once added, its availability will set to available
+        genre_val = genre_entry.get().split(",")
+        
+        for item in b_details:
+            if item == None or item == "":
+                messagebox.showerror('Incomplete Data', "Data is incomplete, complete data first to proceed.")
+                run = False
+                break
+        if run:
+            query = "INSERT INTO book VALUES (%s,%s,%s,%s,%s,%s,%s)"
+            data = (b_details[0], b_details[1],b_details[2], b_details[3], b_details[4], b_details[5], b_details[6]) 
+            cursor.execute(query,data)
+            database.commit()
+
+            #query to insert val for genre table
+            query_genre = "INSERT INTO genre VALUES (%s,%s)"
+            #loop on the values of the genre val
+            for data in genre_val:
+                cursor.execute(query_genre, (book_id_entry.get(),data))
+                database.commit()
+            query_author = "INSERT INTO author VALUES (%s, %s,%s)"
+            cursor.execute(query_author, (book_id_entry.get(),author_fname_entry.get(), author_lname_entry.get()))
+            database.commit()
+
+            book_id_entry.delete(0,END)
+            title_entry.delete(0,END)
+            publisher_entry.delete(0,END)
+            isbn_entry.delete(0,END)
+            yearpub_entry.delete(0,END)
+            bookcost_entry.delete(0,END)
+            genre_entry.delete(0,END) 
+            author_fname_entry.delete(0,END)
+            author_lname_entry.delete(0,END)
+            messagebox.showinfo("Successful", "Successfully added the book in the inventory!")
+            # else:
+            #     messagebox.showerror("Error", "Incorrect input. Please try again!")
+        # except:
+            # messagebox.showerror("Error", "Incorrect input. Please try again!")
+
+    add_button = Button(frame, text="Enter", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 15, pady = 10, command = getdata)
+    add_button.grid(row=19, column=0 , sticky = N, columnspan =3, pady=(20,5))
+
 def add_customer_details():
     try: #destroys existing frames from other display
         frame_destroy()
@@ -509,7 +615,7 @@ def add_customer_details():
     name_entry = Entry(frame, font=('Helvetica',11, "bold"), width=50)
     name_entry.grid(row=4, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
 
-    phonenum_lbl = Label(frame,text= "Phonenumber", background = "#2f2f2d", fg = "white", font = ("Open Sans", 11))
+    phonenum_lbl = Label(frame,text= "Phone Number", background = "#2f2f2d", fg = "white", font = ("Open Sans", 11))
     phonenum_lbl.grid(row=5, column=0, sticky = W, pady=(15,5), padx = 20)
     phonenum_entry = Entry(frame, font=('Helvetica',11, "bold"), width=50)
     phonenum_entry.grid(row=6, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
@@ -599,7 +705,7 @@ title_home.grid(row=0, column = 0, columnspan=4)
 
 #buttons in the sidebar
 display_book_button = Button(sidebar, text="Display\nBooks",  padx = 30, bg='#2f2f2d', fg = "white", font=("Open Sans", 12), borderwidth = 0, command = display_books) 
-add_book_button = Button(sidebar, text="Add Books\nin the Inventory",  bg='#2f2f2d', fg = "white",padx = 30,font=("Open Sans", 12), borderwidth = 0, command=None)
+add_book_button = Button(sidebar, text="Add Books\nin the Inventory",  bg='#2f2f2d', fg = "white",padx = 30,font=("Open Sans", 12), borderwidth = 0, command= add_book_inventory)
 display_customer_button = Button(sidebar, text="Display\nCustomer",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= display_customers)
 display_rentals_button =  Button(sidebar, text="Display\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= None)
 rent_book_button =  Button(sidebar, text="Rent",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=rent_book)

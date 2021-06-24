@@ -18,6 +18,8 @@ cursor = database.cursor()
 #global var, purpose is to preserve val of the variable for later use, like edit function
 orig_bookid = ''
 orig_customerid = ''
+book_count = 0
+cart = []
 
 def frame_destroy():
     frame.destroy()
@@ -636,30 +638,32 @@ def add_customer_details():
     photo_entry.grid(row=12, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
 
     def getdata():
-        try:
-            run = True
-            user_details = [customer_id_entry.get(),name_entry.get(),phonenum_entry.get(),address_entry.get(),val_id_entry.get(),photo_entry.get()]
-            for item in user_details:
-                if item == None or item == "":
-                    messagebox.showerror('Incomplete Data', "Data is incomplete, complete data first to proceed.")
-                    run = False
-                    break
-            if run:
-                query = "INSERT INTO customer VALUES (%s,%s,%s,%s,%s,%s)"
-                data = (user_details[0], user_details[1],user_details[2], user_details[3], user_details[4], user_details[5]) 
-                cursor.execute(query,data)
-                database.commit()
-                messagebox.showinfo("Added", "Customer Details Added!")
-                frame_destroy()
-            else:
-                messagebox.showerror("Error", "Incorrect input. Please try again!")
-        except:
+        #try:
+        run = True
+        user_details = [customer_id_entry.get(),name_entry.get(),phonenum_entry.get(),address_entry.get(),val_id_entry.get(),photo_entry.get()]
+        for item in user_details:
+            if item == None or item == "":
+                messagebox.showerror('Incomplete Data', "Data is incomplete, complete data first to proceed.")
+                run = False
+                break
+        if run:
+            query = "INSERT INTO customer VALUES (%s,%s,%s,%s,%s,%s)"
+            data = (user_details[0], user_details[1],user_details[2], user_details[3], user_details[4], user_details[5]) 
+            cursor.execute(query,data)
+            database.commit()
+            messagebox.showinfo("Added", "Customer Details Added!")
+            frame_destroy()
+            rent_book(user_details[0], user_details[1]) #values (customerID, customerName)
+        else:
             messagebox.showerror("Error", "Incorrect input. Please try again!")
+        #except:
+            
+            #messagebox.showerror("Error", "Incorrect input. Please try again!")
 
     add_button = Button(frame, text="Enter", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 15, pady = 10, command = getdata)
     add_button.grid(row=13, column=0 , sticky = N, columnspan =3, pady=20)
 
-def rent_book():
+def customer_type():
     try: #destroys existing frames from other display
         frame_destroy()
         table_destroy()
@@ -668,13 +672,142 @@ def rent_book():
 
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 230, padx = 380)
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 200, padx = 340)
+
+    customer_type = Label(frame, text="Type of Customer", background = "#2f2f2d", fg = "white", font = ("Open Sans", 20, "bold"))
+    customer_type.grid(row=0, column=0, sticky = NSEW, columnspan =2)
 
     #allows the user to choose, if new_customer add customer details first, else proceed to the rental.
-    new_customer_button = Button(frame, text="New Customer", background = "#2f2f2d", fg = "white", font = ("Open Sans", 14, "bold"), padx =20, pady = 30, command = add_customer_details)
-    new_customer_button.grid(row=0, column=0, padx = (20,10))
+    new_customer_button = Button(frame, text="New Customer", background = "royal blue", fg = "white", font = ("Open Sans", 14, "bold"), padx =20, pady = 30, command = add_customer_details)
+    new_customer_button.grid(row=1, column=0, padx = (50,30), pady = 50)
     old_customer_button = Button(frame, text="Old Customer", background = "#EEEEEE", fg = "black", font = ("Open Sans", 14, "bold"), padx =20, pady = 30)
-    old_customer_button.grid(row=0, column=1, padx = (20,10))
+    old_customer_button.grid(row=1, column=1, padx = (30,50), pady = 50)
+
+def rent_book(customer_id, name):
+    try: #destroys existing frames from other display
+        frame_destroy()
+        table_destroy()
+    except:
+        pass
+    
+    frame_update()
+    table_update()
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
+
+    rent_title = Label(frame, text= "Select Book for Rent", background = "#2f2f2d", font = ("Open Sans", 14, "bold"), fg="white" )
+    rent_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10)
+
+    customer_id_lbl = Label(frame, text= "Customer ID: ", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    customer_id_lbl.grid(row=1, column=0, padx = (5,0), sticky= W)
+
+    name_lbl =  Label(frame, text= "Customer Name: ", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    name_lbl.grid(row=2, column=0, padx = (5,0), sticky = W)
+
+    customer_idnum_entry = Entry(frame, width=10,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    customer_idnum_entry.grid(row=1, column=1, sticky= NSEW)
+
+    customer_name_entry = Entry(frame, width=10,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    customer_name_entry.grid(row=2, column=1, sticky= NSEW)
+   
+    book_count_lbl = Label(frame, text= "Book Count Added on Cart:", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    book_count_lbl.grid(row=1, column=4, padx=(10,0))
+
+    book_count_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    book_count_entry.grid(row=1, column=5, padx=(2,10))
+    
+    customer_idnum_entry.insert(END, customer_id)
+    customer_name_entry.insert(END, name)
+
+    customer_idnum_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
+    customer_name_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
+    book_count_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
+
+    #define columns of the table
+    table ["columns"] = ("Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Book ID", width = 95, anchor = CENTER, stretch = NO)
+    table.column("Title", width = 290, anchor = CENTER)
+    table.column("Publisher", width = 135, anchor = CENTER)
+    table.column("ISBN", width = 155, anchor = CENTER)
+    table.column("Year Published", width = 130, anchor = CENTER)
+    table.column("Book Cost",  width = 110, anchor = CENTER)
+    table.column("Availability",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Book ID", text = "Book ID", anchor = CENTER )
+    table.heading("Title", text = "Title", anchor = CENTER )
+    table.heading("Publisher", text = "Publisher", anchor = CENTER )
+    table.heading("ISBN", text = "ISBN", anchor = CENTER )
+    table.heading("Year Published", text = "Year Published", anchor = CENTER)
+    table.heading("Book Cost", text = "Book Cost",  anchor = CENTER)
+    table.heading("Availability", text = "Availability",  anchor = CENTER)
+
+    count = 0
+    display_book_query = "SELECT * FROM book"
+    cursor.execute(display_book_query)
+    for book_item in cursor:
+        table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]))
+        count += 1
+
+    table.grid(row=3, column=0, rowspan=6, columnspan=6)
+
+    add_button = Button(frame, text="Add", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 32, pady = 10, command = lambda: add_to_cart(book_count_entry))
+    add_button.grid(row=9, column=2 , sticky = E, pady=20)
+
+    rent_button = Button(frame, text="Rent", background = "#4de375", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = None)
+    rent_button.grid(row=9, column=3 , sticky = N, pady=20)
+
+    remove_button = Button(frame, text="Remove", background = "#e64e4e", fg = "white", font = ("Open Sans", 12, "bold"), padx = 15, pady = 10, command = lambda: remove_from_cart(book_count_entry))
+    remove_button.grid(row=9, column=4 , sticky = W, pady=20)
+
+    
+def add_to_cart(book_count_entry): 
+    selected = table.focus()
+    values = table.item(selected, "values")
+    global  book_count
+    if book_count == 5:
+        messagebox.showinfo("Exceed Maximum", "Maximum of 5 books to be rented at a time!")
+        return
+    if values[6].upper() == "AVAILABLE":
+        for item in cart:
+            if item == values[0]:
+                messagebox.showinfo("Already in Cart", "Item is already on the cart")
+                return
+        cart.append(values[0])
+        book_count += 1
+        book_count_entry ["state"] = NORMAL
+        book_count_entry.delete(0, END)
+        book_count_entry.insert(END, book_count)
+        book_count_entry ["state"] = DISABLED
+        #print(cart) #for debugging purposes
+    else:
+        messagebox.showinfo("Not Available", "Book is not available!")
+        
+def remove_from_cart(book_count_entry):
+    selected = table.focus()
+    values = table.item(selected, "values")
+    global  book_count
+    if book_count == 0:
+        messagebox.showinfo("No item", "No book/s added on the cart!")
+        return
+    else:
+        temp = 0
+        for val in cart:
+            if values[0] == val:
+                book_count -= 1
+                cart.remove(val)
+                book_count_entry ["state"] = NORMAL
+                book_count_entry.delete(0, END)
+                book_count_entry.insert(END, book_count)
+                book_count_entry ["state"] = DISABLED
+                messagebox.showinfo("Removed", "Book ID {} removed in the cart".format(values[0]))
+                temp += 1
+                break
+        if temp == 0:
+            messagebox.showinfo("Not in the cart", "Book ID {} not in the cart!".format(values[0]))
+       #print(cart) #for debugging purposes
 
 root = Tk()
 root.title("Book Rental System")
@@ -708,7 +841,7 @@ display_book_button = Button(sidebar, text="Display\nBooks",  padx = 30, bg='#2f
 add_book_button = Button(sidebar, text="Add Books\nin the Inventory",  bg='#2f2f2d', fg = "white",padx = 30,font=("Open Sans", 12), borderwidth = 0, command= add_book_inventory)
 display_customer_button = Button(sidebar, text="Display\nCustomer",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= display_customers)
 display_rentals_button =  Button(sidebar, text="Display\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= None)
-rent_book_button =  Button(sidebar, text="Rent",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=rent_book)
+rent_book_button =  Button(sidebar, text="Rent",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=customer_type)
 display_book_button.grid(row=0, column=0, pady = 20)
 add_book_button.grid(row=1, column=0,  pady = 20)
 display_customer_button.grid(row=2, column=0,  pady = 20)

@@ -4,6 +4,8 @@ from tkinter import messagebox
 import re
 import mysql.connector
 from tkinter import ttk
+import datetime
+from datetime import timedelta, date
 
 #database connection
 database = mysql.connector.connect(
@@ -19,7 +21,9 @@ cursor = database.cursor()
 orig_bookid = ''
 orig_customerid = ''
 book_count = 0
+total_rental_cost = 0
 cart = []
+item_cost = []
 
 def frame_destroy():
     frame.destroy()
@@ -715,12 +719,19 @@ def rent_book(customer_id, name):
     book_count_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
     book_count_entry.grid(row=1, column=5, padx=(2,10))
     
+    total_cost_lbl = Label(frame, text= "Book Count Added on Cart:", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    total_cost_lbl.grid(row=2, column=4, padx=(10,0))
+
+    total_cost_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    total_cost_entry.grid(row=2, column=5, padx=(2,10))
+    
     customer_idnum_entry.insert(END, customer_id)
     customer_name_entry.insert(END, name)
 
     customer_idnum_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
     customer_name_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
     book_count_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
+    total_cost_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
 
     #define columns of the table
     table ["columns"] = ("Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability")
@@ -747,26 +758,29 @@ def rent_book(customer_id, name):
     count = 0
     display_book_query = "SELECT * FROM book"
     cursor.execute(display_book_query)
+
     for book_item in cursor:
         table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]))
         count += 1
 
     table.grid(row=3, column=0, rowspan=6, columnspan=6)
 
-    add_button = Button(frame, text="Add", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 32, pady = 10, command = lambda: add_to_cart(book_count_entry))
+    add_button = Button(frame, text="Add", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 32, pady = 10, command = lambda: add_to_cart(book_count_entry, total_cost_entry))
     add_button.grid(row=9, column=2 , sticky = E, pady=20)
 
-    rent_button = Button(frame, text="Rent", background = "#4de375", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = None)
+    rent_button = Button(frame, text="Rent", background = "#4de375", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = lambda: rent_books_in_cart(customer_id, name))
     rent_button.grid(row=9, column=3 , sticky = N, pady=20)
 
-    remove_button = Button(frame, text="Remove", background = "#e64e4e", fg = "white", font = ("Open Sans", 12, "bold"), padx = 15, pady = 10, command = lambda: remove_from_cart(book_count_entry))
+    remove_button = Button(frame, text="Remove", background = "#e64e4e", fg = "white", font = ("Open Sans", 12, "bold"), padx = 15, pady = 10, command = lambda: remove_from_cart(book_count_entry, total_cost_entry))
     remove_button.grid(row=9, column=4 , sticky = W, pady=20)
 
     
-def add_to_cart(book_count_entry): 
+def add_to_cart(book_count_entry, total_cost_entry): 
     selected = table.focus()
     values = table.item(selected, "values")
     global  book_count
+    global total_rental_cost
+    global item_cost
     if book_count == 5:
         messagebox.showinfo("Exceed Maximum", "Maximum of 5 books to be rented at a time!")
         return
@@ -776,19 +790,27 @@ def add_to_cart(book_count_entry):
                 messagebox.showinfo("Already in Cart", "Item is already on the cart")
                 return
         cart.append(values[0])
+        item_cost.append(values[5])
+        total_rental_cost += int(values[5])
         book_count += 1
         book_count_entry ["state"] = NORMAL
+        total_cost_entry ["state"] = NORMAL
         book_count_entry.delete(0, END)
         book_count_entry.insert(END, book_count)
+        total_cost_entry.delete(0, END)
+        total_cost_entry.insert(END, total_rental_cost)
         book_count_entry ["state"] = DISABLED
+        total_cost_entry ["state"] = DISABLED
         #print(cart) #for debugging purposes
     else:
         messagebox.showinfo("Not Available", "Book is not available!")
         
-def remove_from_cart(book_count_entry):
+def remove_from_cart(book_count_entry, total_cost_entry):
     selected = table.focus()
     values = table.item(selected, "values")
     global  book_count
+    global total_rental_cost
+    global item_cost
     if book_count == 0:
         messagebox.showinfo("No item", "No book/s added on the cart!")
         return
@@ -797,17 +819,53 @@ def remove_from_cart(book_count_entry):
         for val in cart:
             if values[0] == val:
                 book_count -= 1
+                item_cost.remove(values[5])
+                total_rental_cost -= int(values[5])
                 cart.remove(val)
                 book_count_entry ["state"] = NORMAL
+                total_cost_entry["state"] = NORMAL
                 book_count_entry.delete(0, END)
                 book_count_entry.insert(END, book_count)
+                total_cost_entry.delete(0, END)
+                total_cost_entry.insert(END, total_rental_cost)
                 book_count_entry ["state"] = DISABLED
+                total_cost_entry["state"] = DISABLED
                 messagebox.showinfo("Removed", "Book ID {} removed in the cart".format(values[0]))
                 temp += 1
                 break
         if temp == 0:
             messagebox.showinfo("Not in the cart", "Book ID {} not in the cart!".format(values[0]))
        #print(cart) #for debugging purposes
+
+def rent_books_in_cart(customer_id, name):
+    global cart
+    global total_rental_cost
+    global item_cost
+    global book_count
+    date_today = date.today()
+    start_date = date_today.strftime("%Y-%m-%d")
+    due_date = date.today() + timedelta(days=5)
+    prompt = messagebox.askyesno("Confirm", "Are you sure?")
+    
+    if prompt:
+        if len(cart) == 0 or total_rental_cost == 0:
+            messagebox.showinfo("No item in the cart", "No book/books in the cart!")
+            return
+        
+        query_avlb = "UPDATE book SET Availability = %s WHERE BookID = %s"
+        for item in cart: #elements in the cart are the book id of the book rented
+            cursor.execute(query_avlb, ("Not Available",item))
+            database.commit()
+       
+        query_rental = "INSERT INTO rents VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        for bookid, cost in zip(cart,item_cost):
+            cursor.execute(query_rental, (customer_id, bookid, start_date, due_date,None,"Not yet returned",cost))
+            database.commit()
+        messagebox.showinfo("Successful", "Customer ID: {}\nNumber of Books rented: {}\nTotalcost: {}".format(customer_id,book_count,total_rental_cost))
+        cart = []
+        total_rental_cost = 0
+        item_cost = []
+        book_count = 0
 
 root = Tk()
 root.title("Book Rental System")

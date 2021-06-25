@@ -24,6 +24,7 @@ book_count = 0
 total_rental_cost = 0
 cart = []
 item_cost = []
+num_rented_book = 0
 
 def frame_destroy():
     frame.destroy()
@@ -844,6 +845,7 @@ def rent_books_in_cart(customer_id, name):
     global total_rental_cost
     global item_cost
     global book_count
+    global num_rented_book
     date_today = date.today()
     start_date = date_today.strftime("%Y-%m-%d")
     due_date = date.today() + timedelta(days=5)
@@ -853,7 +855,17 @@ def rent_books_in_cart(customer_id, name):
         if len(cart) == 0 or total_rental_cost == 0:
             messagebox.showinfo("No item in the cart", "No book/books in the cart!")
             return
-        
+        cursor.execute("SELECT ReturnStatus FROM rents WHERE CustomerID=%s",(customer_id,))
+
+        for status in cursor:
+            if status[0] == "Not yet returned":
+                num_rented_book += 1
+
+        if num_rented_book + len(cart) >= 5:
+            messagebox.showinfo("Maximum", "Exceed number of books rented!")
+            num_rented_book = 0
+            return
+
         query_avlb = "UPDATE book SET Availability = %s WHERE BookID = %s"
         for item in cart: #elements in the cart are the book id of the book rented
             cursor.execute(query_avlb, ("Not Available",item))
@@ -868,6 +880,7 @@ def rent_books_in_cart(customer_id, name):
         total_rental_cost = 0
         item_cost = []
         book_count = 0
+        frame_destroy()
 
 def pick_customer_to_rent():
     try: #destroys existing frames from other display
@@ -881,7 +894,7 @@ def pick_customer_to_rent():
     frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
 
     select_customer_title = Label(frame, text= "Select Customer to Rent", background = "#2f2f2d", font = ("Open Sans", 14, "bold"), fg="white" )
-    select_customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10)
+    select_customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(75,0))
 
      #define columns of the table
     table ["columns"] = ("Customer ID", "Name", "Phone Number", "Address", "Valid ID", "Photo")
@@ -915,8 +928,103 @@ def pick_customer_to_rent():
     table.grid(row=1, column=0, rowspan=6, columnspan=7)
 
     def get_data():
+        global num_rented_book
         selected = table.focus()
         values = table.item(selected, "values")
+        cursor.execute("SELECT ReturnStatus FROM rents WHERE CustomerID=%s",(values[0],))
+
+        for status in cursor:
+            if status[0] == "Not yet returned":
+                num_rented_book += 1
+
+        if num_rented_book + len(cart) >= 5:
+            messagebox.showinfo("Maximum", "Exceed number of books rented!")
+            num_rented_book = 0
+            return
+        num_rented_book = 0
+        rent_book(values[0], values[1])
+
+    enter_button = Button(frame, text="Enter", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = get_data)
+    enter_button.grid(row=8, column=3 , sticky = N, pady=20)
+
+def pick_customer_to_rent():
+    try: #destroys existing frames from other display
+        frame_destroy()
+        table_destroy()
+    except:
+        pass
+    
+    frame_update()
+    table_update()
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
+
+    rentals_title = Label(frame, text= "Book Rentals", background = "#2f2f2d", font = ("Open Sans", 14, "bold"), fg="white" )
+    rentals_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10)
+
+    customer_id_lbl = Label(frame, text= "Customer ID: ", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    customer_id_lbl.grid(row=1, column=0, padx = (5,0), sticky= W)
+
+    name_lbl =  Label(frame, text= "Customer Name: ", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    name_lbl.grid(row=2, column=0, padx = (5,0), sticky = W)
+
+    customer_idnum_entry = Entry(frame, width=10,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    customer_idnum_entry.grid(row=1, column=1, sticky= NSEW)
+
+    customer_name_entry = Entry(frame, width=10,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    customer_name_entry.grid(row=2, column=1, sticky= NSEW)
+   
+    search_button = Label(frame, text= "Book Count Added on Cart:", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    search_button.grid(row=1, column=5, padx=(10,0))
+
+    book_count_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
+    book_count_entry.grid(row=1, column=4, padx=(2,10))
+
+     #define columns of the table
+    table ["columns"] = ("Customer ID", "Name", "Start Date", "Due Date", "Return Date", "Cost")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Customer ID", width = 95, anchor = CENTER, stretch = NO)
+    table.column("Name", width = 290, anchor = CENTER)
+    table.column("Phone Number", width = 135, anchor = CENTER)
+    table.column("Address", width = 195, anchor = CENTER)
+    table.column("Valid ID", width = 180, anchor = CENTER)
+    table.column("Photo",  width = 180, anchor = CENTER)
+    #table.column("Availability",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Customer ID", text = "Customer ID", anchor = CENTER )
+    table.heading("Name", text = "Full Name", anchor = CENTER )
+    table.heading("Phone Number", text = "Phone Number", anchor = CENTER )
+    table.heading("Address", text = "Address", anchor = CENTER )
+    table.heading("Valid ID", text = "Valid ID", anchor = CENTER)
+    table.heading("Photo", text = "Photo",  anchor = CENTER)
+    # table.heading("Availability", text = "Availability",  anchor = CENTER)
+
+    count = 0
+    display_customer_query = "SELECT * FROM customer"
+    cursor.execute(display_customer_query)
+
+    for customer_details in cursor:
+        table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]))
+        count += 1
+    table.grid(row=1, column=0, rowspan=6, columnspan=7)
+
+    def get_data():
+        global num_rented_book
+        selected = table.focus()
+        values = table.item(selected, "values")
+        cursor.execute("SELECT ReturnStatus FROM rents WHERE CustomerID=%s",(values[0],))
+
+        for status in cursor:
+            if status[0] == "Not yet returned":
+                num_rented_book += 1
+
+        if num_rented_book + len(cart) >= 5:
+            messagebox.showinfo("Maximum", "Exceed number of books rented!")
+            num_rented_book = 0
+            return
+        num_rented_book = 0
         rent_book(values[0], values[1])
 
     enter_button = Button(frame, text="Enter", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = get_data)

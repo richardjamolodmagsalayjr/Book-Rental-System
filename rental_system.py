@@ -609,7 +609,7 @@ def add_customer_details():
     
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 13, columnspan=6, sticky=NW, pady = 40, padx=270)
+    frame.grid(row=1, column=1, rowspan = 13, columnspan=6, sticky=NW, pady = 60, padx=370)
 
     customer_details_title = Label(frame, text="Customer Details", background = "#2f2f2d", fg = "white", font = ("Open Sans", 20, "bold"))
     customer_details_title.grid(row=0, column=0, sticky = N, columnspan =3)
@@ -679,7 +679,7 @@ def customer_type():
 
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 200, padx = 340)
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 170, padx = 340)
 
     customer_type = Label(frame, text="Type of Customer", background = "#2f2f2d", fg = "white", font = ("Open Sans", 20, "bold"))
     customer_type.grid(row=0, column=0, sticky = NSEW, columnspan =2)

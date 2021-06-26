@@ -781,6 +781,7 @@ def rent_book(customer_id, name):
 def add_to_cart(book_count_entry, total_cost_entry): 
     selected = table.focus()
     values = table.item(selected, "values")
+    
     global  book_count
     global total_rental_cost
     global item_cost
@@ -792,6 +793,8 @@ def add_to_cart(book_count_entry, total_cost_entry):
             if item == values[0]:
                 messagebox.showinfo("Already in Cart", "Item is already on the cart")
                 return
+        #changes availability to added once
+        added_item = table.item(selected, text = "", values=(values[0], values[1], values[2], values[3], values[4], values[5], "Added"))
         cart.append(values[0])
         item_cost.append(values[5])
         total_rental_cost += int(values[5])
@@ -821,6 +824,7 @@ def remove_from_cart(book_count_entry, total_cost_entry):
         temp = 0
         for val in cart:
             if values[0] == val:
+                removed_item = table.item(selected, text = "", values=(values[0], values[1], values[2], values[3], values[4], values[5], "Available"))
                 book_count -= 1
                 item_cost.remove(values[5])
                 total_rental_cost -= int(values[5])

@@ -998,6 +998,50 @@ def pick_customer_to_rent():
     enter_button = Button(frame, text="Enter", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = get_data)
     enter_button.grid(row=9, column=0 , sticky = N, pady=20, columnspan = 6, padx = (150, 0))
 
+def search_rentals(search_entry):
+    try:
+        table_destroy()
+        table_update()
+    except:
+        pass
+
+    #define columns of the table
+    table ["columns"] = ("Customer ID", "Customer Name", "Book ID", "Start Date", "Due Date", "Return Date", "Return Status", "Cost")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Customer ID", width = 120, anchor = CENTER, stretch = NO)
+    table.column("Customer Name", width = 175, anchor = CENTER, stretch = NO)
+    table.column("Book ID", width =120, anchor = CENTER)
+    table.column("Start Date", width = 140, anchor = CENTER)
+    table.column("Due Date", width = 140, anchor = CENTER)
+    table.column("Return Date", width = 140, anchor = CENTER)
+    table.column("Return Status", width = 140, anchor = CENTER)
+    table.column("Cost",  width = 80, anchor = CENTER)
+    #table.column("Availability",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Customer ID", text = "Customer ID", anchor = CENTER )
+    table.heading("Customer Name", text = "Customer Name", anchor = CENTER )
+    table.heading("Book ID", text = "Book ID", anchor = CENTER )
+    table.heading("Start Date", text = "Start Date", anchor = CENTER )
+    table.heading("Due Date", text = "Due Date", anchor = CENTER )
+    table.heading("Return Date", text = "Return Date", anchor = CENTER)
+    table.heading("Return Status", text = "Return Status",  anchor = CENTER)
+    table.heading("Cost", text = "Cost",  anchor = CENTER)
+    # table.heading("Availability", text = "Availability",  anchor = CENTER)
+
+    count = 0
+    search_query= "SELECT rents.CustomerID, customer.Name, rents.BookID, rents.StartDate, rents.DueDate, rents.ReturnDate, rents.ReturnStatus, rents.PaymentCost FROM book_rental.rents INNER JOIN customer ON rents.CustomerID = customer.CustomerID WHERE rents.CustomerID LIKE %s or customer.Name LIKE %s or rents.BookID LIKE %s"
+    data = (search_entry.get(), search_entry.get(), search_entry.get(),)
+    search_entry.delete(0,END)
+    cursor.execute(search_query, data)
+
+    for rents_col in cursor:
+        table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]))
+        count += 1
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+
 def display_rentals():
     try: #destroys existing frames from other display
         frame_destroy()
@@ -1010,48 +1054,32 @@ def display_rentals():
     frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
 
     rentals_title = Label(frame, text= "Book Rentals", background = "#2f2f2d", font = ("Open Sans", 18, "bold"), fg="white" )
-    rentals_title.grid(row=0, column=0, sticky=N, columnspan = 6, pady=10, padx = (40, 0))
+    rentals_title.grid(row=0, column=0, sticky=N, columnspan = 6, pady=10, padx = (140, 0))
 
-    customer_id_lbl = Label(frame, text= "Customer ID: ", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
-    customer_id_lbl.grid(row=1, column=0, padx = (5,0), sticky= W)
+    search_button = Button(frame, text= "Search",  background = "royal blue", font = ("Open Sans", 10, "bold"), fg="white", padx = 20, command = lambda: search_rentals(search_entry))
+    search_button.grid(row=1, column=6, sticky = W, pady=5)
 
-    customer_idnum_entry = Entry(frame, width=10,fg='white', font=('Open Sans',10, 'bold'), borderwidth=0, background="#2f2f2d")
-    customer_idnum_entry.grid(row=1, column=1, sticky= NSEW)
+    search_entry = Entry(frame, width=20,fg='black', font=('Open Sans',10, 'bold'), borderwidth=1, background="white")
+    search_entry.grid(row=1, column=5, sticky=E, padx = (0,15), pady=5)
 
-    customer_name_lbl =  Label(frame, text= "Customer Name: ", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
-    customer_name_lbl.grid(row=2, column=0, padx = (5,0), sticky = W)
-
-    customer_name_entry = Entry(frame, width=10,fg='white', font=('Open Sans',10, 'bold'), borderwidth=0, background="#2f2f2d")
-    customer_name_entry.grid(row=2, column=1, sticky= NSEW)
-   
-    search_button = Button(frame, text= "Search",  background = "royal blue", font = ("Open Sans", 10, "bold"), fg="white", padx = 5, command = None)
-    search_button.grid(row=1, column=6, sticky = W)
-
-    search_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="white")
-    search_entry.grid(row=1, column=5, sticky=E, padx = (0,15))
-
-    customer_idnum_entry["state"] = DISABLED
-    customer_name_entry["state"] = DISABLED
-
-    customer_idnum_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
-    customer_name_entry.config(state="disabled", disabledbackground = "#2f2f2d", disabledforeground = "white")
-
-     #define columns of the table
-    table ["columns"] = ("Customer ID", "Book ID", "Start Date", "Due Date", "Return Date", "Return Status", "Cost")
+    #define columns of the table
+    table ["columns"] = ("Customer ID", "Customer Name", "Book ID", "Start Date", "Due Date", "Return Date", "Return Status", "Cost")
     #Format columns
     table.column("#0", width = 0, stretch = NO)
-    table.column("Customer ID", width = 95, anchor = CENTER, stretch = NO)
-    table.column("Book ID", width =95, anchor = CENTER)
-    table.column("Start Date", width = 135, anchor = CENTER)
-    table.column("Due Date", width = 195, anchor = CENTER)
-    table.column("Return Date", width = 180, anchor = CENTER)
-    table.column("Return Status", width = 180, anchor = CENTER)
-    table.column("Cost",  width = 180, anchor = CENTER)
+    table.column("Customer ID", width = 120, anchor = CENTER, stretch = NO)
+    table.column("Customer Name", width = 175, anchor = CENTER, stretch = NO)
+    table.column("Book ID", width =120, anchor = CENTER)
+    table.column("Start Date", width = 140, anchor = CENTER)
+    table.column("Due Date", width = 140, anchor = CENTER)
+    table.column("Return Date", width = 140, anchor = CENTER)
+    table.column("Return Status", width = 140, anchor = CENTER)
+    table.column("Cost",  width = 80, anchor = CENTER)
     #table.column("Availability",  width = 115, anchor = CENTER)
 
     #create headings
     table.heading("0")
     table.heading("Customer ID", text = "Customer ID", anchor = CENTER )
+    table.heading("Customer Name", text = "Customer Name", anchor = CENTER )
     table.heading("Book ID", text = "Book ID", anchor = CENTER )
     table.heading("Start Date", text = "Start Date", anchor = CENTER )
     table.heading("Due Date", text = "Due Date", anchor = CENTER )
@@ -1061,18 +1089,18 @@ def display_rentals():
     # table.heading("Availability", text = "Availability",  anchor = CENTER)
 
     count = 0
-    display_rents_query = "SELECT * FROM rents"
+    display_rents_query = "SELECT rents.CustomerID, customer.Name, rents.BookID, rents.StartDate, rents.DueDate, rents.ReturnDate, rents.ReturnStatus, rents.PaymentCost FROM book_rental.rents INNER JOIN customer ON rents.CustomerID = customer.CustomerID"
     cursor.execute(display_rents_query)
 
     for rents_col in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6]))
+        table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]))
         count += 1
-    table.grid(row=3, column=0, rowspan=6, columnspan=7)
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
     def return_rent():
         selected = table.focus()
         values = table.item(selected, "values")
-        if values[5] == "Returned":
+        if values[6] == "Returned":
             messagebox.showinfo("Invalid", "Book is already returned!")
             return
         else:
@@ -1080,22 +1108,22 @@ def display_rentals():
             cur_date = date_today.strftime("%Y-%m-%d") #once returned button is clickied, the return date is the current date
             #query to update the rent table, specifically the return status column
             query_update_return_status = "UPDATE rents SET  ReturnDate = %s, ReturnStatus = %s WHERE CustomerID = %s and BookID = %s"
-            data = (cur_date, "Returned",  values[0], values[1],)
+            data = (cur_date, "Returned",  values[0], values[2],)
             cursor.execute(query_update_return_status, data)
             database.commit()
             #query to update the availability of the book to "Available" in the book table
             query_update_book_avlb = "UPDATE book SET Availability = %s WHERE BookID = %s"
-            data = ("Available", values[1],)
+            data = ("Available", values[2],)
             cursor.execute(query_update_book_avlb, data)
             database.commit()
 
             #replace values in the table once book is returned
-            new_val = table.item(selected, text = "", values=(values[0], values[1], values[2], values[3], cur_date, "Returned", values[6]))
+            new_val = table.item(selected, text = "", values=(values[0], values[1], values[2], values[3], values[4], cur_date, "Returned", values[7]))
 
-            messagebox.showinfo("Returned", "Book ID {} is now returned! by Customer ID {}.".format(values[1], values[0]))
+            messagebox.showinfo("Returned", "Book ID {} is now returned! by {} - {} .".format(values[2], values[0],values[1]))
 
     return_button = Button(frame, text="Return", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = return_rent)
-    return_button.grid(row=9, column=3 , sticky = N, pady=20)
+    return_button.grid(row=8, column=4 , sticky = W, pady=(10,5), padx = (150,0))
 
 root = Tk()
 root.title("Book Rental System")

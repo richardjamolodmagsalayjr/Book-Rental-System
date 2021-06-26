@@ -191,18 +191,69 @@ def select_customer(customer_id_entry, name_entry, phonenum_entry, address_entry
         edit_button["state"] = DISABLED
         messagebox.showerror("Select Data", "No data was selected!")
 
+def search_customer(search_entry):
+    try:
+        table_destroy()
+        table_update()
+    except:
+        pass
+    
+    #define columns of the table
+    table ["columns"] = ("Customer ID", "Name", "Phone Number", "Address", "Valid ID", "Photo")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Customer ID", width = 95, anchor = CENTER, stretch = NO)
+    table.column("Name", width = 290, anchor = CENTER)
+    table.column("Phone Number", width = 135, anchor = CENTER)
+    table.column("Address", width = 195, anchor = CENTER)
+    table.column("Valid ID", width = 180, anchor = CENTER)
+    table.column("Photo",  width = 180, anchor = CENTER)
+    #table.column("Availability",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Customer ID", text = "Customer ID", anchor = CENTER )
+    table.heading("Name", text = "Full Name", anchor = CENTER )
+    table.heading("Phone Number", text = "Phone Number", anchor = CENTER )
+    table.heading("Address", text = "Address", anchor = CENTER )
+    table.heading("Valid ID", text = "Valid ID", anchor = CENTER)
+    table.heading("Photo", text = "Photo",  anchor = CENTER)
+    # table.heading("Availability", text = "Availability",  anchor = CENTER)
+    
+    count = 0
+    search_query = "SELECT * FROM customer WHERE CustomerID LIKE %s or Name LIKE %s or PhoneNumber LIKE %s or Address LIKE %s"
+    data = (search_entry.get(), search_entry.get(), search_entry.get(),search_entry.get(),)
+    search_entry.delete(0,END)
+    cursor.execute(search_query, data)
+
+    for customer in cursor:
+        table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]))
+        count += 1
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+
 def display_customers():
     try:
         frame_destroy()
         table_destroy()
     except:
         pass
-    frame_update()
+    frame_update()  
     table_update()
     frame.grid(row=1, column=1, rowspan = 7, columnspan=7, sticky="nw", pady = 50, padx = 80)
     
+     
+    customer_title = Label(frame, text= "Customers", background = "#2f2f2d", font = ("Open Sans", 20, "bold"), fg="white" )
+    customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(100,0))
+
+    search_entry = Entry(frame, width = 20, fg = "Black", font= ("Open Sans", 10, "bold"))
+    search_entry.grid(row=1, column=5, sticky=E, pady = 5)
+
+    search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_customer(search_entry))
+    search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = (15,0))
+    
     #define columns of the table
     table ["columns"] = ("Customer ID", "Name", "Phone Number", "Address", "Valid ID", "Photo")
+
     #Format columns
     table.column("#0", width = 0, stretch = NO)
     table.column("Customer ID", width = 95, anchor = CENTER, stretch = NO)
@@ -229,7 +280,7 @@ def display_customers():
     for customer_details in cursor:
         table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]))
         count += 1
-    table.grid(row=0, column=0, rowspan=6, columnspan=7)
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
     #entry boxes for update book info
     header = ["Customer ID", "Full Name", "Phone Number", "Address", "Valid ID", "Photo"]
@@ -237,52 +288,92 @@ def display_customers():
 
         if item == 1:
             e = Entry(frame, width=20, font=('Helvetica',8, "bold"), justify = CENTER)
-            e.grid(row=6, column=item,sticky = NSEW) 
+            e.grid(row=8, column=item,sticky = NSEW) 
             e.insert(END, header[item])
             e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
         else:
             if item == 1:
                 e = Entry(frame, width=10, font=('Helvetica',8, "bold"), justify = CENTER)
-                e.grid(row=6, column=item, sticky = NSEW, padx = 5) 
+                e.grid(row=8, column=item, sticky = NSEW, padx = 5) 
                 e.insert(END, header[item])
                 e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
             else:
                 e = Entry(frame, width=12, font=('Helvetica',8, "bold"), justify = CENTER)
-                e.grid(row=6, column=item, sticky = NSEW) 
+                e.grid(row=8, column=item, sticky = NSEW) 
                 e.insert(END, header[item])
                 e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
 
     # entry for update inputs
     customer_id_entry = Entry(frame, width=20, font=('Helvetica',8), justify = CENTER)
-    customer_id_entry.grid(row = 7, column = 0, sticky = NSEW)
+    customer_id_entry.grid(row = 9, column = 0, sticky = NSEW)
 
     name_entry = Entry(frame, width=30, font=('Helvetica',8), justify = CENTER)
-    name_entry.grid(row = 7, column = 1, sticky = NSEW)
+    name_entry.grid(row = 9, column = 1, sticky = NSEW)
 
     phonenum_entry = Entry(frame, width=20, font=('Helvetica',8), justify = CENTER)
-    phonenum_entry.grid(row = 7, column = 2, sticky = NSEW)
+    phonenum_entry.grid(row = 9, column = 2, sticky = NSEW)
 
     address_entry = Entry(frame, width=35, font=('Helvetica',8), justify = CENTER)
-    address_entry.grid(row = 7, column = 3, sticky = NSEW)
+    address_entry.grid(row = 9, column = 3, sticky = NSEW)
 
     val_id_entry = Entry(frame, width=35, font=('Helvetica',8), justify = CENTER)
-    val_id_entry.grid(row = 7, column = 4, sticky = NSEW)
+    val_id_entry.grid(row = 9, column = 4, sticky = NSEW)
 
     photo_entry = Entry(frame, width=35, font=('Helvetica',8), justify = CENTER)
-    photo_entry.grid(row = 7, column = 5, sticky = NSEW)
+    photo_entry.grid(row = 9, column = 5, sticky = NSEW)
 
     # avlb_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     # avlb_entry.grid(row = 7, column = 6, sticky = NSEW)
 
     edit_button = Button(frame, text="Edit", padx =33, pady = 10, state = "disabled",  borderwidth = "2", bg='royal blue1',fg='white', font=("Open Sans", 8, "bold"), command= lambda: edit_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button, orig_customerid))
-    edit_button.grid(row=8, column=2, pady = 5, padx = 15, sticky=E)
+    edit_button.grid(row=10, column=2, pady = 5, padx = 15, sticky=E)
 
     del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command= lambda: delete_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button, orig_customerid))
-    del_button.grid(row=8, column=4, pady = 5, sticky=W, padx = 15)
+    del_button.grid(row=10, column=4, pady = 5, sticky=W, padx = 15)
 
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button))
-    select_button.grid(row=8, column=3 , pady = 5, sticky=N, padx = 15)
+    select_button.grid(row=10, column=3 , pady = 5, sticky=N, padx = 15)
+    
+def search_book(search_entry):
+    try:
+        table_destroy()
+        table_update()
+    except:
+        pass
 
+    #define columns of the table
+    table ["columns"] = ("Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Book ID", width = 95, anchor = CENTER, stretch = NO)
+    table.column("Title", width = 290, anchor = CENTER)
+    table.column("Publisher", width = 135, anchor = CENTER)
+    table.column("ISBN", width = 155, anchor = CENTER)
+    table.column("Year Published", width = 130, anchor = CENTER)
+    table.column("Book Cost",  width = 110, anchor = CENTER)
+    table.column("Availability",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Book ID", text = "Book ID", anchor = CENTER )
+    table.heading("Title", text = "Title", anchor = CENTER )
+    table.heading("Publisher", text = "Publisher", anchor = CENTER )
+    table.heading("ISBN", text = "ISBN", anchor = CENTER )
+    table.heading("Year Published", text = "Year Published", anchor = CENTER)
+    table.heading("Book Cost", text = "Book Cost",  anchor = CENTER)
+    table.heading("Availability", text = "Availability",  anchor = CENTER)
+
+    count = 0
+    search_query = "SELECT * FROM book WHERE BookID LIKE %s or Title LIKE %s or Publisher LIKE %s or ISBN LIKE %s or YearPublished LIKE %s or BookCost LIKE %s or Availability LIKE %s"
+    data = (search_entry.get(), search_entry.get(), search_entry.get(),search_entry.get(), search_entry.get(), search_entry.get(), search_entry.get(),)
+    search_entry.delete(0,END)
+    cursor.execute(search_query, data)
+
+    for book in cursor:
+        table.insert(parent = '', index='end', iid = count, values = (book[0], book[1], book[2], book[3], book[4], book[5], book[6]))
+        count += 1
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+    
 def display_books():
     try:
         frame_destroy()
@@ -291,8 +382,18 @@ def display_books():
         pass
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="nw", pady = 50, padx = 80)
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="nw", pady = 20, padx = 80)
     
+    
+    book_title = Label(frame, text= "Books", background = "#2f2f2d", font = ("Open Sans", 20, "bold"), fg="white" )
+    book_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(100,0))
+
+    search_entry = Entry(frame, width = 20, fg = "Black", font= ("Open Sans", 10, "bold"))
+    search_entry.grid(row=1, column=5, sticky=E, pady = 5)
+
+    search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_book(search_entry))
+    search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = (15,0))
+
     #define columns of the table
     table ["columns"] = ("Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability")
     #Format columns
@@ -321,7 +422,7 @@ def display_books():
     for book_item in cursor:
         table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]))
         count += 1
-    table.grid(row=0, column=0, rowspan=6, columnspan=7)
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
     #entry boxes for update book info
     header = ["Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability"]
@@ -329,51 +430,51 @@ def display_books():
 
         if item == 1:
             e = Entry(frame, width=20, font=('Helvetica',8, "bold"), justify = CENTER)
-            e.grid(row=6, column=item,sticky = NSEW) 
+            e.grid(row=8, column=item,sticky = NSEW) 
             e.insert(END, header[item])
             e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
         else:
             if item == 1:
                 e = Entry(frame, width=10, font=('Helvetica',8, "bold"), justify = CENTER)
-                e.grid(row=6, column=item, sticky = NSEW, padx = 5) 
+                e.grid(row=8, column=item, sticky = NSEW, padx = 5) 
                 e.insert(END, header[item])
                 e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
             else:
                 e = Entry(frame, width=12, font=('Helvetica',8, "bold"), justify = CENTER)
-                e.grid(row=6, column=item, sticky = NSEW) 
+                e.grid(row=8, column=item, sticky = NSEW) 
                 e.insert(END, header[item])
                 e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
 
     # entry for update inputs
     book_id_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    book_id_entry.grid(row = 7, column = 0, sticky = NSEW)
+    book_id_entry.grid(row = 9, column = 0, sticky = NSEW)
 
     title_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    title_entry.grid(row = 7, column = 1, sticky = NSEW)
+    title_entry.grid(row = 9, column = 1, sticky = NSEW)
 
     publisher_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    publisher_entry.grid(row = 7, column = 2, sticky = NSEW)
+    publisher_entry.grid(row = 9, column = 2, sticky = NSEW)
 
     isbn_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    isbn_entry.grid(row = 7, column = 3, sticky = NSEW)
+    isbn_entry.grid(row = 9, column = 3, sticky = NSEW)
 
     yearpub_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    yearpub_entry.grid(row = 7, column = 4, sticky = NSEW)
+    yearpub_entry.grid(row = 9, column = 4, sticky = NSEW)
 
     bookcost_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    bookcost_entry.grid(row = 7, column = 5, sticky = NSEW)
+    bookcost_entry.grid(row = 9, column = 5, sticky = NSEW)
 
     avlb_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
-    avlb_entry.grid(row = 7, column = 6, sticky = NSEW)
+    avlb_entry.grid(row = 9, column = 6, sticky = NSEW)
 
     edit_button = Button(frame, text="Edit", padx =33, pady = 10, state = "disabled",  borderwidth = "2", bg='royal blue1',fg='white', font=("Open Sans", 8, "bold"), command=lambda: edit_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button, orig_bookid))
-    edit_button.grid(row=8, column=2, pady = 5, padx = 15, sticky=W)
+    edit_button.grid(row=10, column=2, pady = 5, padx = 40, sticky=W)
 
     del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command=lambda: delete_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button, orig_bookid))
-    del_button.grid(row=8, column=4, pady = 5, sticky=W, padx = 15)
+    del_button.grid(row=10, column=4, pady = 5, sticky=E, padx = 15)
 
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button))
-    select_button.grid(row=8, column=3 , pady = 5, sticky=W, padx = 15)
+    select_button.grid(row=10, column=3 , pady = 5, sticky=W, padx = (15,15))
 
 def login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button):
     try:
@@ -936,16 +1037,16 @@ def pick_customer_to_rent():
     
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 20, padx = 50)
 
     select_customer_title = Label(frame, text= "Select Customer to Rent", background = "#2f2f2d", font = ("Open Sans", 14, "bold"), fg="white" )
-    select_customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(175,0))
+    select_customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(155,0))
 
     search_entry = Entry(frame, width = 20, fg = "Black", font= ("Open Sans", 10, "bold"))
-    search_entry.grid(row=1, column=5, sticky=E, pady = 5)
+    search_entry.grid(row=1, column=5, sticky=E, pady = 5, padx = (770,5))
 
     search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_customer_to_rent(search_entry))
-    search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = 5)
+    search_button.grid(row=1, column=6, sticky=E, pady = 5, padx = (0,15))
 
      #define columns of the table
     table ["columns"] = ("Customer ID", "Name", "Phone Number", "Address", "Valid ID", "Photo")
@@ -1051,16 +1152,16 @@ def display_rentals():
     
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 50, padx = 50)
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="NW", pady = 20, padx = 50)
 
     rentals_title = Label(frame, text= "Book Rentals", background = "#2f2f2d", font = ("Open Sans", 18, "bold"), fg="white" )
     rentals_title.grid(row=0, column=0, sticky=N, columnspan = 6, pady=10, padx = (140, 0))
 
     search_button = Button(frame, text= "Search",  background = "royal blue", font = ("Open Sans", 10, "bold"), fg="white", padx = 20, command = lambda: search_rentals(search_entry))
-    search_button.grid(row=1, column=6, sticky = W, pady=5)
+    search_button.grid(row=1, column=6, sticky = E, pady=5, padx = (0,15))
 
     search_entry = Entry(frame, width=20,fg='black', font=('Open Sans',10, 'bold'), borderwidth=1, background="white")
-    search_entry.grid(row=1, column=5, sticky=E, padx = (0,15), pady=5)
+    search_entry.grid(row=1, column=5, sticky=E, padx = (500,5), pady=5)
 
     #define columns of the table
     table ["columns"] = ("Customer ID", "Customer Name", "Book ID", "Start Date", "Due Date", "Return Date", "Return Status", "Cost")
@@ -1123,7 +1224,7 @@ def display_rentals():
             messagebox.showinfo("Returned", "Book ID {} is now returned! by {} - {} .".format(values[2], values[0],values[1]))
 
     return_button = Button(frame, text="Return", background = "royal blue", fg = "white", font = ("Open Sans", 12, "bold"), padx = 30, pady = 10, command = return_rent)
-    return_button.grid(row=8, column=4 , sticky = W, pady=(10,5), padx = (150,0))
+    return_button.grid(row=8, column=0, sticky = N, pady=(10,5), padx = (150,0), columnspan = 6)
 
 root = Tk()
 root.title("Book Rental System")

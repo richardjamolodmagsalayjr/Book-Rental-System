@@ -226,10 +226,16 @@ def search_customer(search_entry):
     search_entry.delete(0,END)
     cursor.execute(search_query, data)
 
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+
     for customer in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]))
+        if count%2==0:
+            table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]), tags=("odd",))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]), tags=("even",))
         count += 1
-    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+    table.grid(row=2, column=0, rowspan=6, columnspan=6)
 
 def display_customers():
     try:
@@ -239,17 +245,17 @@ def display_customers():
         pass
     frame_update()  
     table_update()
-    frame.grid(row=1, column=1, rowspan = 7, columnspan=7, sticky="nw", pady = 50, padx = 80)
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="nw", pady = 20, padx = 50)
     
      
     customer_title = Label(frame, text= "Customers", background = "#2f2f2d", font = ("Open Sans", 20, "bold"), fg="white" )
-    customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(100,0))
+    customer_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(30,0))
 
     search_entry = Entry(frame, width = 20, fg = "Black", font= ("Open Sans", 10, "bold"))
-    search_entry.grid(row=1, column=5, sticky=E, pady = 5)
+    search_entry.grid(row=1, column=4, sticky=E, pady = 5, padx =(20, 15))
 
     search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_customer(search_entry))
-    search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = (15,0))
+    search_button.grid(row=1, column=5, sticky=W, pady = 5, padx = (0,15))
     
     #define columns of the table
     table ["columns"] = ("Customer ID", "Name", "Phone Number", "Address", "Valid ID", "Photo")
@@ -277,10 +283,17 @@ def display_customers():
     count = 0
     display_customer_query = "SELECT * FROM customer"
     cursor.execute(display_customer_query)
+    
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+
     for customer_details in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]))
+        if count%2==0:
+            table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]), tags=("odd",))
+        else:
+             table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]), tags=("even",))
         count += 1
-    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+    table.grid(row=2, column=0, rowspan=6, columnspan=6)
 
     #entry boxes for update book info
     header = ["Customer ID", "Full Name", "Phone Number", "Address", "Valid ID", "Photo"]
@@ -304,35 +317,35 @@ def display_customers():
                 e.config(state="disabled", disabledbackground = "white", disabledforeground = "black")
 
     # entry for update inputs
-    customer_id_entry = Entry(frame, width=20, font=('Helvetica',8), justify = CENTER)
+    customer_id_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     customer_id_entry.grid(row = 9, column = 0, sticky = NSEW)
 
-    name_entry = Entry(frame, width=30, font=('Helvetica',8), justify = CENTER)
+    name_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     name_entry.grid(row = 9, column = 1, sticky = NSEW)
 
-    phonenum_entry = Entry(frame, width=20, font=('Helvetica',8), justify = CENTER)
+    phonenum_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     phonenum_entry.grid(row = 9, column = 2, sticky = NSEW)
 
-    address_entry = Entry(frame, width=35, font=('Helvetica',8), justify = CENTER)
+    address_entry = Entry(frame, width=15, font=('Helvetica',8), justify = CENTER)
     address_entry.grid(row = 9, column = 3, sticky = NSEW)
 
-    val_id_entry = Entry(frame, width=35, font=('Helvetica',8), justify = CENTER)
+    val_id_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     val_id_entry.grid(row = 9, column = 4, sticky = NSEW)
 
-    photo_entry = Entry(frame, width=35, font=('Helvetica',8), justify = CENTER)
+    photo_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     photo_entry.grid(row = 9, column = 5, sticky = NSEW)
 
     # avlb_entry = Entry(frame, width=10, font=('Helvetica',8), justify = CENTER)
     # avlb_entry.grid(row = 7, column = 6, sticky = NSEW)
 
     edit_button = Button(frame, text="Edit", padx =33, pady = 10, state = "disabled",  borderwidth = "2", bg='royal blue1',fg='white', font=("Open Sans", 8, "bold"), command= lambda: edit_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button, orig_customerid))
-    edit_button.grid(row=10, column=2, pady = 5, padx = 15, sticky=E)
+    edit_button.grid(row=10, column=2, pady = 5, padx = (0,30), sticky=E)
 
     del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command= lambda: delete_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button, orig_customerid))
-    del_button.grid(row=10, column=4, pady = 5, sticky=W, padx = 15)
+    del_button.grid(row=10, column=4, pady = 5, sticky=W, padx = (15,100))
 
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button))
-    select_button.grid(row=10, column=3 , pady = 5, sticky=N, padx = 15)
+    select_button.grid(row=10, column=3 , pady = 5, sticky=N, padx = (15,30))
     
 def search_book(search_entry):
     try:
@@ -369,11 +382,59 @@ def search_book(search_entry):
     search_entry.delete(0,END)
     cursor.execute(search_query, data)
 
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+
     for book in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (book[0], book[1], book[2], book[3], book[4], book[5], book[6]))
+        if count&2==0:
+            table.insert(parent = '', index='end', iid = count, values = (book[0], book[1], book[2], book[3], book[4], book[5], book[6]), tags = ("odd",))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (book[0], book[1], book[2], book[3], book[4], book[5], book[6]), tags = ("even",))
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
-    
+
+def display_by_ISBN(event):
+    try:
+        frame_destroy()
+        table_destroy()
+    except:
+        pass
+
+    frame_update()
+    table_update()
+    frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="nw", pady = 20, padx = 80)
+        
+    book_title = Label(frame, text= "Books", background = "#2f2f2d", font = ("Open Sans", 20, "bold"), fg="white" )
+    book_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(100,0))
+
+    search_entry = Entry(frame, width = 20, fg = "Black", font= ("Open Sans", 10, "bold"))
+    search_entry.grid(row=1, column=5, sticky=E, pady = 5)
+
+    search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_book(search_entry))
+    search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = (15,0))
+
+    #define columns of the table
+    table ["columns"] = ("Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Available Copies")
+    #Format columns
+    table.column("#0", width = 0, stretch = NO)
+    table.column("Title", width = 95, anchor = CENTER, stretch = NO)
+    table.column("Publisher", width = 135, anchor = CENTER)
+    table.column("ISBN", width = 155, anchor = CENTER)
+    table.column("Year Published", width = 130, anchor = CENTER)
+    table.column("Book Cost",  width = 110, anchor = CENTER)
+    table.column("Available Copies",  width = 115, anchor = CENTER)
+
+    #create headings
+    table.heading("0")
+    table.heading("Title", text = "Title", anchor = CENTER )
+    table.heading("Publisher", text = "Publisher", anchor = CENTER )
+    table.heading("ISBN", text = "ISBN", anchor = CENTER )
+    table.heading("Year Published", text = "Year Published", anchor = CENTER)
+    table.heading("Book Cost", text = "Book Cost",  anchor = CENTER)
+    table.heading("Available Copies", text = "Available Copies",  anchor = CENTER)
+
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+
 def display_books():
     try:
         frame_destroy()
@@ -393,6 +454,12 @@ def display_books():
 
     search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_book(search_entry))
     search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = (15,0))
+
+    display_options = ["Display","By Book ID","By ISBN"] #options in the combobox
+    display_dropdown = ttk.Combobox(frame, values = display_options)
+    display_dropdown.grid(row=1, column=0, padx=(10,20), pady=5, sticky="w")
+    display_dropdown.current(0) #initially set combobox to "Display"
+    display_dropdown.bind("<<ComboboxSelected>>",display_dropdown)
 
     #define columns of the table
     table ["columns"] = ("Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability")
@@ -419,8 +486,15 @@ def display_books():
     count = 0
     display_book_query = "SELECT * FROM book"
     cursor.execute(display_book_query)
+
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+
     for book_item in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]))
+        if count%2==0:
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("odd",))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("even",))
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
@@ -475,6 +549,10 @@ def display_books():
 
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button))
     select_button.grid(row=10, column=3 , pady = 5, sticky=W, padx = (15,15))
+
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+
+
 
 def login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button):
     try:
@@ -605,7 +683,7 @@ def add_book_inventory():
     
     frame_update()
     table_update()
-    frame.grid(row=1, column=1, rowspan = 19, columnspan=6, sticky=NW, pady = 40, padx=270)
+    frame.grid(row=1, column=1, rowspan = 19, columnspan=6, sticky=NW, pady = 40, padx=430)
 
     book_details_title = Label(frame, text="Book Details", background = "#2f2f2d", fg = "white", font = ("Open Sans", 18, "bold"))
     book_details_title.grid(row=0, column=0, sticky = N, columnspan =3)
@@ -863,8 +941,14 @@ def rent_book(customer_id, name):
     display_book_query = "SELECT * FROM book"
     cursor.execute(display_book_query)
 
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+
     for book_item in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]))
+        if count % 2 == 0:
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("odd",))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("even",))
         count += 1
 
     table.grid(row=3, column=0, rowspan=6, columnspan=6)
@@ -1023,9 +1107,16 @@ def search_customer_to_rent(search_entry):
     search_entry.delete(0,END)
     cursor.execute(search_query, data)
 
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+    
     for customer in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]))
+        if count % 2 == 0:
+            table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]), tags=("odd",))
+        else:
+             table.insert(parent = '', index='end', iid = count, values = (customer[0], customer[1], customer[2], customer[3], customer[4], customer[5]), tags=("even",))
         count += 1
+
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
 def pick_customer_to_rent():
@@ -1073,9 +1164,15 @@ def pick_customer_to_rent():
     count = 0
     display_customer_query = "SELECT * FROM customer"
     cursor.execute(display_customer_query)
+    
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
 
     for customer_details in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]))
+        if count % 2 == 0:
+            table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]), tags = ("odd",))
+        else:
+             table.insert(parent = '', index='end', iid = count, values = (customer_details[0], customer_details[1], customer_details[2], customer_details[3], customer_details[4], customer_details[5]), tags = ("even",))
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
@@ -1137,9 +1234,15 @@ def search_rentals(search_entry):
     data = (search_entry.get(), search_entry.get(), search_entry.get(),)
     search_entry.delete(0,END)
     cursor.execute(search_query, data)
+    
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
 
     for rents_col in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]))
+        if count % 2 == 0:
+            table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]), tags=("odd",))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]), tags=("even",))
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
@@ -1161,7 +1264,7 @@ def display_rentals():
     search_button.grid(row=1, column=6, sticky = E, pady=5, padx = (0,15))
 
     search_entry = Entry(frame, width=20,fg='black', font=('Open Sans',10, 'bold'), borderwidth=1, background="white")
-    search_entry.grid(row=1, column=5, sticky=E, padx = (500,5), pady=5)
+    search_entry.grid(row=1, column=5, sticky=E, padx = (750,5), pady=5)
 
     #define columns of the table
     table ["columns"] = ("Customer ID", "Customer Name", "Book ID", "Start Date", "Due Date", "Return Date", "Return Status", "Cost")
@@ -1193,8 +1296,13 @@ def display_rentals():
     display_rents_query = "SELECT rents.CustomerID, customer.Name, rents.BookID, rents.StartDate, rents.DueDate, rents.ReturnDate, rents.ReturnStatus, rents.PaymentCost FROM book_rental.rents INNER JOIN customer ON rents.CustomerID = customer.CustomerID"
     cursor.execute(display_rents_query)
 
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
     for rents_col in cursor:
-        table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]))
+        if count %2 == 0:
+            table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]), tags = ("odd", ))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (rents_col[0],rents_col[1],rents_col[2], rents_col[3], rents_col[4], rents_col[5], rents_col[6], rents_col[7]), tags = ("even", ))
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
@@ -1300,6 +1408,7 @@ style.configure("Treeview", background = "#2f2f2d", rowheight = 30, fieldbackgro
 style.configure("Treeview",font=("Montserrat", 12), foreground = "white")
 style.configure("Treeview.Heading",font=("Montserrat", 12),  background = "#2f2f2d", foreground = "white")
 style.map("Treeview", background=[("selected", "#403b35")])
+style.map("Treeview", foreground=[("selected", "white")])
 
 login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_book_button, search_button, role_entry, return_rentals_button)
 

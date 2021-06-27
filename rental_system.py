@@ -393,9 +393,13 @@ def search_book(search_entry):
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
+def display_custmer_billing():
+    pass
+    
+
+#pending, to be solve later (least prioritized)
 def display_by_ISBN(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, select_button, delete_button, edit_button ):
     try:
-      
         table_destroy()
     except:
         pass
@@ -434,9 +438,8 @@ def display_by_ISBN(book_id_entry, title_entry, publisher_entry, isbn_entry, yea
 
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
     
-    
     count = 0
-    display_book_query = "SELECT * FROM book"
+    display_book_query = "SELECT book.Title, book.Publisher, book.ISBN, book.YearPublished book.BookCost FROM book"
     cursor.execute(display_book_query)
 
     table.tag_configure('even', background = "#2f2f2d")
@@ -444,12 +447,12 @@ def display_by_ISBN(book_id_entry, title_entry, publisher_entry, isbn_entry, yea
 
     for book_item in cursor:
         if count%2==0:
-            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("odd",))
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4]), tags=("odd",))
         else:
-            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("even",))
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4]), tags=("even",))
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
-    
+
     book_id_entry["state"] = DISABLED
     title_entry["state"] = DISABLED
     publisher_entry["state"] = DISABLED
@@ -1129,8 +1132,8 @@ def search_customer_to_rent(search_entry):
     # table.heading("Availability", text = "Availability",  anchor = CENTER)
 
     count = 0
-    search_query = "SELECT * FROM customer WHERE CustomerID LIKE %s or PhoneNumber LIKE %s or Address LIKE %s"
-    data = (search_entry.get(), search_entry.get(), search_entry.get(),)
+    search_query = "SELECT * FROM customer WHERE CustomerID LIKE %s or Name LIKE %s or PhoneNumber LIKE %s or Address LIKE %s"
+    data = (search_entry.get(), search_entry.get(), search_entry.get(), search_entry.get(),)
     search_entry.delete(0,END)
     cursor.execute(search_query, data)
 
@@ -1389,12 +1392,12 @@ title_home.grid(row=0, column = 0, columnspan=4)
 #button icons
 
 #buttons in the sidebar
-display_book_button = Button(sidebar, text="Display\nBooks",  padx = 30, bg='#2f2f2d', fg = "white", font=("Open Sans", 12), borderwidth = 0, command = display_books) 
-add_book_button = Button(sidebar, text="Add Books\nin the Inventory",  bg='#2f2f2d', fg = "white",padx = 30,font=("Open Sans", 12), borderwidth = 0, command= add_book_inventory)
-display_customer_button = Button(sidebar, text="Display\nCustomer",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= display_customers)
-display_rentals_button =  Button(sidebar, text="Display\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command= None)
-rent_book_button =  Button(sidebar, text="Rent",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=customer_type)
-return_rentals_button = Button(sidebar, text="Return\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 12), borderwidth = 0, command=display_rentals)
+display_book_button = Button(sidebar, text="Display\nBooks",  padx = 30, bg='#2f2f2d', fg = "white", font=("Open Sans", 14), borderwidth = 0, command = display_books) 
+add_book_button = Button(sidebar, text="Add Books\nin the Inventory",  bg='#2f2f2d', fg = "white",padx = 30,font=("Open Sans", 14), borderwidth = 0, command= add_book_inventory)
+display_customer_button = Button(sidebar, text="Display\nCustomer",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 14), borderwidth = 0, command= display_customers)
+display_rentals_button =  Button(sidebar, text="Billing",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 14), borderwidth = 0, command= None)
+rent_book_button =  Button(sidebar, text="Rent",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 14), borderwidth = 0, command=customer_type)
+return_rentals_button = Button(sidebar, text="Return\nRentals",  bg='#2f2f2d', fg = "white", padx = 30,font=("Open Sans", 14), borderwidth = 0, command=display_rentals)
 
 rent_book_button.grid(row=0, column=0, pady=20)
 return_rentals_button.grid(row=1, column=0,pady=20)

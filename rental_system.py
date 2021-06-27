@@ -393,17 +393,17 @@ def search_book(search_entry):
         count += 1
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
 
-def display_by_ISBN(event):
+def display_by_ISBN(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, select_button, delete_button, edit_button ):
     try:
-        frame_destroy()
+      
         table_destroy()
     except:
         pass
 
-    frame_update()
     table_update()
     frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="nw", pady = 20, padx = 80)
-        
+
+
     book_title = Label(frame, text= "Books", background = "#2f2f2d", font = ("Open Sans", 20, "bold"), fg="white" )
     book_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(100,0))
 
@@ -417,13 +417,12 @@ def display_by_ISBN(event):
     table ["columns"] = ("Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Available Copies")
     #Format columns
     table.column("#0", width = 0, stretch = NO)
-    table.column("Title", width = 95, anchor = CENTER, stretch = NO)
-    table.column("Publisher", width = 135, anchor = CENTER)
-    table.column("ISBN", width = 155, anchor = CENTER)
-    table.column("Year Published", width = 130, anchor = CENTER)
-    table.column("Book Cost",  width = 110, anchor = CENTER)
-    table.column("Available Copies",  width = 115, anchor = CENTER)
-
+    table.column("Title", width = 230, anchor = CENTER, stretch = NO)
+    table.column("Publisher", width = 170, anchor = CENTER)
+    table.column("ISBN", width = 170, anchor = CENTER)
+    table.column("Year Published", width = 140, anchor = CENTER)
+    table.column("Book Cost",  width = 140, anchor = CENTER)
+    table.column("Available Copies",  width = 180, anchor = CENTER)
     #create headings
     table.heading("0")
     table.heading("Title", text = "Title", anchor = CENTER )
@@ -434,6 +433,34 @@ def display_by_ISBN(event):
     table.heading("Available Copies", text = "Available Copies",  anchor = CENTER)
 
     table.grid(row=2, column=0, rowspan=6, columnspan=7)
+    
+    
+    count = 0
+    display_book_query = "SELECT * FROM book"
+    cursor.execute(display_book_query)
+
+    table.tag_configure('even', background = "#2f2f2d")
+    table.tag_configure('odd', background = "#2b2a27")
+
+    for book_item in cursor:
+        if count%2==0:
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("odd",))
+        else:
+            table.insert(parent = '', index='end', iid = count, values = (book_item[0], book_item[1], book_item[2], book_item[3], book_item[4], book_item[5], book_item[6]), tags=("even",))
+        count += 1
+    table.grid(row=2, column=0, rowspan=6, columnspan=7)
+    
+    book_id_entry["state"] = DISABLED
+    title_entry["state"] = DISABLED
+    publisher_entry["state"] = DISABLED
+    isbn_entry["state"] = DISABLED
+    yearpub_entry["state"] = DISABLED
+    bookcost_entry["state"] = DISABLED
+    avlb_entry["state"] = DISABLED
+    select_button["state"] = DISABLED
+    edit_button["state"] = DISABLED
+    del_button["state"] = DISABLED
+    
 
 def display_books():
     try:
@@ -445,7 +472,6 @@ def display_books():
     table_update()
     frame.grid(row=1, column=1, rowspan = 7, columnspan=6, sticky="nw", pady = 20, padx = 80)
     
-    
     book_title = Label(frame, text= "Books", background = "#2f2f2d", font = ("Open Sans", 20, "bold"), fg="white" )
     book_title.grid(row=0, column=0, sticky=NSEW, columnspan = 6, pady=10, padx=(100,0))
 
@@ -455,11 +481,12 @@ def display_books():
     search_button = Button(frame, text = "Seacrh", font= ("Open Sans", 10, "bold"), padx = 20, fg = "White", background = "royal blue", command= lambda: search_book(search_entry))
     search_button.grid(row=1, column=6, sticky=W, pady = 5, padx = (15,0))
 
-    display_options = ["Display","By Book ID","By ISBN"] #options in the combobox
-    display_dropdown = ttk.Combobox(frame, values = display_options)
-    display_dropdown.grid(row=1, column=0, padx=(10,20), pady=5, sticky="w")
-    display_dropdown.current(0) #initially set combobox to "Display"
-    display_dropdown.bind("<<ComboboxSelected>>",display_dropdown)
+    by_book_id_button = Button(frame, text = "By Book ID", font= ("Open Sans", 10, "bold"), padx = 10, fg = "White", background = "#2f2f2d", command= display_books)
+    by_book_id_button.grid(row=1, column=0, sticky=W, pady = 5, padx = (15,0))
+
+    by_isbn_button = Button(frame, text = "By Isbn", font= ("Open Sans", 10, "bold"), padx = 15, fg = "White", background = "#2f2f2d", command= lambda: display_by_ISBN(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, select_button, del_button, edit_button ))
+    by_isbn_button.grid(row=1, column=1, sticky=W, pady = 5, padx = (15,0))
+
 
     #define columns of the table
     table ["columns"] = ("Book ID", "Title", "Publisher", "ISBN", "Year Published", "Book Cost", "Availability")

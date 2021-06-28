@@ -81,7 +81,7 @@ def delete_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub
     
     del_prompt = messagebox.askyesno("Delete data", "Are you sure to delete it?") 
     if del_prompt:
-        
+
         cursor.execute(delete_query_rents, (book_id_entry.get(),))
         database.commit()
 
@@ -687,13 +687,20 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
 
         role_lbl = Label(frame,text= "Role", background = "#2f2f2d", fg = "white", font = ("Open Sans", 14))
         role_lbl.grid(row=5, column=0, sticky = W, pady=(20,10), padx = 20)
-        role_ent = Entry(frame, font=('Helvetica',14, "bold"), width=50)
-        role_ent.grid(row=6, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+        # role_ent = Entry(frame, font=('Helvetica',14, "bold"), width=50)
+        # role_ent.grid(row=6, column = 0, columnspan = 3, sticky = NSEW, padx = 20)
+        
+        # copy this, change entry to dropdown
+        roles = ["Select Role", "Administrator", "Clerk"]
+        role_ent = ttk.Combobox(frame, values = roles)
+        role_ent.grid(row=6, column=0, columnspan= 3, sticky="nsew", padx =20)
+        role_ent.current(0) #initially set combobox to Select Course
+        #role_ent.grid(row=6, column=1, padx=(0,20), pady=20)
 
         def getdata():
             try:
                 user_data = []
-                if username_entry.get() != "" and password_entry.get() != "" and role_ent.get() != "":
+                if username_entry.get() != "" and password_entry.get() != "" and role_ent.get() != "" and role_ent.get() != "Select Role":
                     user_data = [username_entry.get(), password_entry.get(), role_ent.get().capitalize()] #role is always upper for uniformity when displayed
                     query = "INSERT INTO user VALUES (%s,%s,%s)"
                     data = (user_data[0], user_data[1], user_data[2]) 

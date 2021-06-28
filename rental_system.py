@@ -131,7 +131,7 @@ def edit_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_e
             del_button["state"] = DISABLED
             edit_button["state"] = DISABLED
         except:
-            messagebox.showerror("Error", "Book ID {} is already taken. Please provide unique Book ID".format(book_id_entry.get()))
+            messagebox.showerror("Error", "Book ID {} is already taken. Please provide unique Book ID or book is not available of the moment.".format(book_id_entry.get()))
 
 def select_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button):
     try:
@@ -341,7 +341,7 @@ def display_customers():
     edit_button = Button(frame, text="Edit", padx =33, pady = 10, state = "disabled",  borderwidth = "2", bg='royal blue1',fg='white', font=("Open Sans", 8, "bold"), command= lambda: edit_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button, orig_customerid))
     edit_button.grid(row=10, column=2, pady = 5, padx = (0,30), sticky=E)
 
-    del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command= lambda: delete_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button, orig_customerid))
+    del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command= lambda: delete_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button))
     del_button.grid(row=10, column=4, pady = 5, sticky=W, padx = (15,100))
 
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button))
@@ -574,7 +574,7 @@ def display_books():
     edit_button = Button(frame, text="Edit", padx =33, pady = 10, state = "disabled",  borderwidth = "2", bg='royal blue1',fg='white', font=("Open Sans", 8, "bold"), command=lambda: edit_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button, orig_bookid))
     edit_button.grid(row=10, column=2, pady = 5, padx = 40, sticky=W)
 
-    del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command=lambda: delete_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button, orig_bookid))
+    del_button = Button(frame, text="Delete", padx =25, pady = 10, state = "disabled",  borderwidth = "2", bg='#e64e4e', fg = "white", font=("Open Sans", 8, "bold"), command=lambda: delete_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button))
     del_button.grid(row=10, column=4, pady = 5, sticky=E, padx = 15)
 
     select_button = Button(frame, text="Select Data", padx =25, pady = 10, borderwidth = "2", bg='#B99976', fg = "black", font=("Open Sans", 8, "bold"), command=lambda: select_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button))
@@ -1006,7 +1006,7 @@ def add_to_cart(book_count_entry, total_cost_entry):
     if values[6].upper() == "AVAILABLE":
         for item in cart:
             if item == values[0]:
-                messagebox.showinfo("Already in Cart", "Item is already on the cart")
+                messagebox.showinfo("Already in Cart", "Item is already on the cart")   #to be fixed
                 return
         #changes availability to added once
         added_item = table.item(selected, text = "", values=(values[0], values[1], values[2], values[3], values[4], values[5], "Added"))

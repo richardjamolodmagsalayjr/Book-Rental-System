@@ -51,12 +51,18 @@ def check_ID(key):
 
 def delete_customer(customer_id_entry, name_entry, phonenum_entry, address_entry, val_id_entry, photo_entry, del_button, edit_button):
     delete_query = "DELETE FROM customer WHERE CustomerID = %s"
+    delete_query_referenced = "DELETE FROM rents WHERE CustomerID = %s"
     del_prompt = messagebox.askyesno("Delete student data", "Are you sure to delete it?") 
     if del_prompt:
         del_data = table.selection()[0] #deletes selected data in treeview
         table.delete(del_data)
+
+        cursor.execute(delete_query_referenced, (customer_id_entry.get(),))# try
+        database.commit()
         cursor.execute(delete_query, (customer_id_entry.get(),))
         database.commit()
+      
+
         customer_id_entry.delete(0, END)
         name_entry.delete(0, END)
         phonenum_entry.delete(0, END)
@@ -69,12 +75,27 @@ def delete_customer(customer_id_entry, name_entry, phonenum_entry, address_entry
 
 def delete_book(book_id_entry, title_entry, publisher_entry, isbn_entry, yearpub_entry, bookcost_entry, avlb_entry, del_button, edit_button):
     delete_query = "DELETE FROM book WHERE BookID = %s"
+    delete_query_rents = "DELETE FROM rents WHERE BookID = %s"
+    delete_query_genre = "DELETE FROM genre WHERE BookID = %s"
+    delete_query_author = "DELETE FROM author WHERE BookID = %s"
+    
     del_prompt = messagebox.askyesno("Delete data", "Are you sure to delete it?") 
     if del_prompt:
-        del_data = table.selection()[0] #deletes selected data in treeview
-        table.delete(del_data)
+        
+        cursor.execute(delete_query_rents, (book_id_entry.get(),))
+        database.commit()
+
+        cursor.execute(delete_query_genre, (book_id_entry.get(),))
+        database.commit()
+
+        cursor.execute(delete_query_author, (book_id_entry.get(),))
+        database.commit()
+
         cursor.execute(delete_query, (book_id_entry.get(),))
         database.commit()
+
+        del_data = table.selection()[0] #deletes selected data in treeview
+        table.delete(del_data)
         book_id_entry.delete(0, END)
         title_entry.delete(0, END)
         publisher_entry.delete(0, END)

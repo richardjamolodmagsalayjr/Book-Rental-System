@@ -931,7 +931,7 @@ def rent_book(customer_id, name):
     book_count_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")
     book_count_entry.grid(row=1, column=5, padx=(2,10))
     
-    total_cost_lbl = Label(frame, text= "Book Count Added on Cart:", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
+    total_cost_lbl = Label(frame, text= "Total Cost:", background = "#2f2f2d", font = ("Open Sans", 10, "bold"), fg="white" )
     total_cost_lbl.grid(row=2, column=4, padx=(10,0))
 
     total_cost_entry = Entry(frame, width=15,fg='white', font=('Open Sans',10, 'bold'), borderwidth=1, background="#2f2f2d")

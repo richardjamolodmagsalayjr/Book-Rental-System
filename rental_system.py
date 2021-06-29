@@ -658,7 +658,7 @@ def login(display_book_button, add_book_button, display_customer_button, display
         login_button.grid(row=5, column=1, sticky = W, pady = (30,10), padx = 20)
         ask_signin = Label(frame, text="Don't have an account?", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"))
         ask_signin.grid(row=6, column=1, sticky=W, pady = (20,0))
-        signin_button = Button(frame, text="Sign in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button))
+        signin_button = Button(frame, text="Sign in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, role_entry, return_rentals_button))
         signin_button.grid(row=7, column=1, sticky = W, pady = (5,20), padx= 50)
 
     except:
@@ -726,7 +726,7 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
         signin_button.grid(row=7, column=1, sticky = W, pady = (30,10), padx = 20)
         ask_login = Label(frame, text="Already have an account?", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"))
         ask_login.grid(row=8, column=1, sticky=W, pady = (20,0))
-        login_button = Button(frame, text="Log in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button))
+        login_button = Button(frame, text="Log in", background = "#2f2f2d", fg = "white", font = ("Open Sans", 10, "bold"), borderwidth = 0, command = lambda: login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, role_entry, return_rentals_button))
         login_button.grid(row=9, column=1, sticky = W, pady = (5,20), padx= 50)
 
     except:
@@ -1442,7 +1442,7 @@ add_book_button.grid(row=5, column=0,  pady = 20)
 # search_button.grid(row=0, column=5,padx=(5,0))
 
 date_lbl = Label(header, text = "Date:", fg='white', font=('Open Sans',10, 'bold'), borderwidth=0, background="#403b35")
-date_entry = Entry(header, width=20,fg='black', font=('Open Sans',12, 'bold'), borderwidth="0")
+date_entry = Entry(header, width=20,fg='black', font=('Open Sans',10, 'bold'), borderwidth="0")
 date_lbl.grid(row=0, column=4, padx=(600,0))
 date_entry.grid(row=0, column=5,padx=(5,0))
 date_today = date.today()

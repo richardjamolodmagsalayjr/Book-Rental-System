@@ -605,7 +605,7 @@ def display_books():
 
 
 
-def login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button):
+def login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, role_entry, return_rentals_button):
     try:
         frame_destroy()
         frame_update()
@@ -643,7 +643,7 @@ def login(display_book_button, add_book_button, display_customer_button, display
                     display_customer_button ["state"] = NORMAL
                     display_rentals_button ["state"] = NORMAL
                     rent_button ["state"] = NORMAL
-                    search_button ["state"] = NORMAL
+                    #search_button ["state"] = NORMAL
                     return_rentals_button ["state"] = NORMAL
                     role_entry.insert(END, users[0])
                     role_entry.config(state="disabled", disabledbackground = "#403b35", disabledforeground = "white") 
@@ -664,7 +664,7 @@ def login(display_book_button, add_book_button, display_customer_button, display
     except:
         messagebox.showerror("Error", "Incorrect username or password")
 
-def signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, search_button, role_entry, return_rentals_button):
+def signin(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_button, role_entry, return_rentals_button):
     try:
         frame_destroy()
         frame_update()
@@ -711,7 +711,7 @@ def signin(display_book_button, add_book_button, display_customer_button, displa
                     display_customer_button ["state"] = NORMAL
                     display_rentals_button ["state"] = NORMAL
                     rent_button ["state"] = NORMAL
-                    search_button ["state"] = NORMAL
+                    #search_button ["state"] = NORMAL
                     return_rentals_button ["state"] = NORMAL
                     role_entry.insert(END, user_data[2])
                     role_entry.config(state="disabled", disabledbackground = "#403b35", disabledforeground = "white") 
@@ -1435,11 +1435,19 @@ display_rentals_button.grid(row=4, column=0, pady=20)
 add_book_button.grid(row=5, column=0,  pady = 20)
 
 #search button
-search_button = Button(header, text="Search", bg='royalblue1',fg="white", padx = 20, font=("Open Sans", 10, "bold"), borderwidth = 0, command = None)
-search_entry = Entry(header, width=20,fg='black', font=('Open Sans',12, 'bold'), borderwidth="2")
+# search_button = Button(header, text="Search", bg='royalblue1',fg="white", padx = 20, font=("Open Sans", 10, "bold"), borderwidth = 0, command = None)
+# search_entry = Entry(header, width=20,fg='black', font=('Open Sans',12, 'bold'), borderwidth="2")
 
-search_entry.grid(row=0, column=4, padx=(600,0))
-search_button.grid(row=0, column=5,padx=(5,0))
+# search_entry.grid(row=0, column=4, padx=(600,0))
+# search_button.grid(row=0, column=5,padx=(5,0))
+
+date_lbl = Label(header, text = "Date:", fg='white', font=('Open Sans',10, 'bold'), borderwidth=0, background="#403b35")
+date_entry = Entry(header, width=20,fg='black', font=('Open Sans',12, 'bold'), borderwidth="0")
+date_lbl.grid(row=0, column=4, padx=(600,0))
+date_entry.grid(row=0, column=5,padx=(5,0))
+date_today = date.today()
+date_entry.insert(0,  date_today.strftime("%Y-%m-%d"))
+date_entry.config(state="disabled", disabledbackground = "#403b35", disabledforeground = "white") 
 
 #role label and entry
 role_lbl = Label(header, text = "User:", fg='white', font=('Open Sans',10, 'bold'), borderwidth=0, background="#403b35")
@@ -1454,7 +1462,7 @@ display_customer_button ["state"] = DISABLED
 display_rentals_button ["state"] = DISABLED
 rent_book_button ["state"] = DISABLED
 return_rentals_button ["state"] = DISABLED 
-search_button ["state"] = DISABLED 
+#search_button ["state"] = DISABLED 
 
 #initialize table and map its style
 table = ttk.Treeview(frame, height = 12)
@@ -1468,6 +1476,6 @@ style.configure("Treeview.Heading",font=("Montserrat", 12),  background = "#2f2f
 style.map("Treeview", background=[("selected", "#403b35")])
 style.map("Treeview", foreground=[("selected", "white")])
 
-login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_book_button, search_button, role_entry, return_rentals_button)
+login(display_book_button, add_book_button, display_customer_button, display_rentals_button, rent_book_button,  role_entry, return_rentals_button)
 
 root.mainloop()
